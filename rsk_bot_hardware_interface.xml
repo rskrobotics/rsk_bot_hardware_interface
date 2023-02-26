@@ -1,0 +1,9 @@
+<library path="rsk_bot_hardware_interface">
+  <class name="rsk_bot_hardware/RSKBotSystemHardware"
+         type="rsk_bot_hardware::RSKBotSystemHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ros2_control minimal hardware interface template
+    </description>
+  </class>
+</library>
