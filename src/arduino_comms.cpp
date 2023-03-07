@@ -99,8 +99,8 @@ std::string ArduinoComms::sendMsg(const std::string &msg_to_send, bool print_out
 
     // if (print_output)
     // {
-        RCLCPP_INFO(rclcpp::get_logger("RSKBotSystemHardware"), "Sent: %s", msg_to_send.c_str());
-        RCLCPP_INFO(rclcpp::get_logger("RSKBotSystemHardware"), "Response: %s", response.c_str());
+    //    RCLCPP_INFO(rclcpp::get_logger("RSKBotSystemHardware"), "Sent: %s", msg_to_send.c_str());
+    //    RCLCPP_INFO(rclcpp::get_logger("RSKBotSystemHardware"), "Response: %s", response.c_str());
 
         // RCLCPP_INFO_STREAM(logger_,"Sent: " << msg_to_send);
         // RCLCPP_INFO_STREAM(logger_,"Received: " << response);
