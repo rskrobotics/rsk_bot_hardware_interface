@@ -24,6 +24,8 @@ add_library(
   ${PROJECT_NAME}
   SHARED
   src/rsk_bot_hardware_interface.cpp
+  src/wheel.cpp
+  src/arduino_comms.cpp
 )
 target_include_directories(
   ${PROJECT_NAME}

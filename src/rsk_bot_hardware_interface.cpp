@@ -36,6 +36,7 @@ hardware_interface::CallbackReturn RSKBotSystemHardware::on_init(
     return hardware_interface::CallbackReturn::ERROR;
   }
 
+  time_ = std::chrono::system_clock::now();
   cfg_.left_wheel_name = info_.hardware_parameters["left_wheel_name"];
   cfg_.right_wheel_name = info_.hardware_parameters["right_wheel_name"];
   cfg_.loop_rate = std::stof(info_.hardware_parameters["loop_rate"]);
@@ -52,6 +53,8 @@ hardware_interface::CallbackReturn RSKBotSystemHardware::on_init(
 
   // Set up the Arduino
   arduino_.setup(cfg_.device, cfg_.baud_rate, cfg_.timeout); 
+
+  RCLCPP_INFO(rclcpp::get_logger("RSKBotSystemHardware"), "Serial comms open");
 
   hw_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
   hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
@@ -101,9 +104,9 @@ RSKBotSystemHardware::export_state_interfaces()
 {
   std::vector<hardware_interface::StateInterface> state_interfaces;
   state_interfaces.emplace_back(hardware_interface::StateInterface(l_wheel_.name, hardware_interface::HW_IF_VELOCITY, &l_wheel_.vel));
-  // state_interfaces.emplace_back(hardware_interface::StateInterface(l_wheel_.name, hardware_interface::HW_IF_POSITION, &l_wheel_.pos));
+  state_interfaces.emplace_back(hardware_interface::StateInterface(l_wheel_.name, hardware_interface::HW_IF_POSITION, &l_wheel_.pos));
   state_interfaces.emplace_back(hardware_interface::StateInterface(r_wheel_.name, hardware_interface::HW_IF_VELOCITY, &r_wheel_.vel));
-  // state_interfaces.emplace_back(hardware_interface::StateInterface(r_wheel_.name, hardware_interface::HW_IF_POSITION, &r_wheel_.pos));
+  state_interfaces.emplace_back(hardware_interface::StateInterface(r_wheel_.name, hardware_interface::HW_IF_POSITION, &r_wheel_.pos));
 
   return state_interfaces;
 }
@@ -145,7 +148,19 @@ hardware_interface::return_type RSKBotSystemHardware::read(
   if (!arduino_.connected()){
     return hardware_interface::return_type::ERROR;
   }
-  arduino_.readRPM(l_wheel_.vel, r_wheel_.vel);
+  auto new_time = std::chrono::system_clock::now();
+  std::chrono::duration<double> diff = new_time - time_;
+  double deltaSeconds = diff.count();
+  time_ = new_time;
+  arduino_.readEncoderValues(l_wheel_.enc, r_wheel_.enc);
+
+  double pos_prev = l_wheel_.pos;
+  l_wheel_.pos = l_wheel_.calcEncAngle();
+  l_wheel_.vel = (l_wheel_.pos - pos_prev) / deltaSeconds;
+
+  pos_prev = r_wheel_.pos;
+  r_wheel_.pos = r_wheel_.calcEncAngle();
+  r_wheel_.vel = (r_wheel_.pos - pos_prev) / deltaSeconds;
   return hardware_interface::return_type::OK;
 
 }
@@ -153,11 +168,11 @@ hardware_interface::return_type RSKBotSystemHardware::read(
 hardware_interface::return_type RSKBotSystemHardware::write(
   const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
 {
+  
     if (!arduino_.connected()){
     return hardware_interface::return_type::ERROR;
   }
   arduino_.setMotorValues(l_wheel_.cmd, r_wheel_.cmd);
-
 
   return hardware_interface::return_type::OK;
 }

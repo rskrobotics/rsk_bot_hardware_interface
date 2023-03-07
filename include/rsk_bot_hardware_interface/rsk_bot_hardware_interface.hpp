@@ -51,6 +51,8 @@ private:
   Wheel l_wheel_;
   Wheel r_wheel_;
 
+  std::chrono::time_point<std::chrono::system_clock> time_;
+
   std::vector<double> hw_commands_;
   std::vector<double> hw_states_;
 };

@@ -1,5 +1,5 @@
-// #ifndef DIFFDRIVE_RSK_WHEEL_H
-// #define DIFFDRIVE_RSK_WHEEL_H
+#ifndef DIFFDRIVE_ARDUINO_WHEEL_H
+#define DIFFDRIVE_ARDUINO_WHEEL_H
 
 #include <string>
 
@@ -24,10 +24,11 @@ class Wheel
     
     void setup(const std::string &wheel_name, int counts_per_rev);
 
+    double calcEncAngle();
 
 
 
 };
 
 
-// #endif // DIFFDRIVE_ARDUINO_WHEEL_H
+#endif // DIFFDRIVE_ARDUINO_WHEEL_H

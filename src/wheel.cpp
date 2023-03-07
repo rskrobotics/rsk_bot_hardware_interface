@@ -1,4 +1,4 @@
-#include "rsk_bot_hardware_interface/wheel.h"
+#include "rsk_bot_hardware_interface/wheel.hpp"
 
 #include <cmath>
 
